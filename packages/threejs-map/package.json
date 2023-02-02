@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/d3": "^7.4.0",
+    "d3": "^7.8.2",
     "three": "^0.149.0"
   },
   "devDependencies": {
