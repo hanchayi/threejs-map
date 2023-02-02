@@ -1,0 +1,24 @@
+{
+  "name": "threejs-map",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanchayi/threejs-map.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hanchayi/threejs-map/issues"
+  },
+  "homepage": "https://github.com/hanchayi/threejs-map#readme",
+  "packageManager": "pnpm@7.12.2"
+}
