@@ -18,7 +18,6 @@ import {
   Material,
 } from "three";
 import * as d3 from 'd3';
-import chinaJSON from '../china-map/china.json'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export default class ThreeJSMap {
@@ -29,7 +28,7 @@ export default class ThreeJSMap {
   private map: Object3D;
   private control: OrbitControls;
   private raycaster: Raycaster;
-  private mouse: Vector2;
+  private mouse?: Vector2;
   private options: ThreeJSMapOptions;
   private onMouseMove: (event: MouseEvent) => void;
   private rect: DOMRect;
@@ -51,7 +50,8 @@ export default class ThreeJSMap {
   // 相机
   private initCamera(options: ThreeJSMapOptions) {
     this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
-    this.camera.position.set(0, 0, 120);
+    const [ x, y, z ] = this.options.camera
+    this.camera.position.set(x, y, z);
     this.camera.lookAt(this.scene.position);
   }
 
@@ -86,12 +86,12 @@ export default class ThreeJSMap {
     // 魔卡托投影变换
     const projection = d3
       .geoMercator()
-      .center([104.0, 37.5])
-      .scale(80)
+      .center(this.options.center as [number, number])
       .translate([0, 0])
     const map = this.map;
 
-    chinaJSON.features.forEach((elem) => {
+    const geojson = this.options.geojson;
+    geojson.features.forEach((elem) => {
       const province = new Object3D();
 
       // 坐标数组
@@ -106,16 +106,16 @@ export default class ThreeJSMap {
 
           const points: Vector3[] = [];
           for (let i = 0; i < polygon.length; i++) {
-            const [x, y] = projection(polygon[i]) as any
+            const [x, y] = projection(polygon[i] as any) as any
             if (i === 0) {
               shape.moveTo(x, -y)
             }
             shape.lineTo(x, -y);
-            points.push(new Vector3(x, -y, 4.01));
+            points.push(new Vector3(x, -y, this.options.depth));
           }
 
           const extrudeSettings = {
-            depth: 10,
+            depth: this.options.depth,
             bevelEnabled: false,
             steps: 2,
             bevelThickness: 1,
@@ -155,8 +155,8 @@ export default class ThreeJSMap {
   // 射线追踪
   private initRaycaster() {
     this.raycaster = new Raycaster();
-    this.mouse = new Vector2();
     this.onMouseMove = (event) => {
+      this.mouse = new Vector2();
       // 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
       this.mouse.x = ((event.clientX - this.rect.left )/ this.options.width) * 2 - 1
       this.mouse.y = -((event.clientY - this.rect.top) / this.options.height) * 2 + 1
@@ -177,26 +177,29 @@ export default class ThreeJSMap {
     requestAnimationFrame(() => {
       this.animate();
     });
-    // 通过摄像机和鼠标位置更新射线
-    this.raycaster.setFromCamera(this.mouse, this.camera)
-    // 算出射线 与当场景相交的对象有那些
-    const intersects = this.raycaster.intersectObjects(
-      this.scene.children,
-      true
-    )
 
-    // 恢复上一次清空的
-    if (this.lastPick) {
-      this.lastPick.object.material[0].color.set('#2defff')
-      this.lastPick.object.material[1].color.set('#3480C4')
-    }
-    this.lastPick = undefined
-    this.lastPick = intersects.find(
-      (item) => item && item.object && (item.object as Mesh).material && ((item.object as Mesh).material as Material[]).length === 2
-    ) as Intersection<Mesh>;
-    if (this.lastPick) {
-      this.lastPick.object.material[0].color.set(0xff0000)
-      this.lastPick.object.material[1].color.set(0xff0000)
+    if (this.mouse) {
+      // 通过摄像机和鼠标位置更新射线
+      this.raycaster.setFromCamera(this.mouse, this.camera)
+      // 算出射线 与当场景相交的对象有那些
+      const intersects = this.raycaster.intersectObjects(
+        this.scene.children,
+        true
+      )
+
+      // 恢复上一次清空的
+      if (this.lastPick) {
+        this.lastPick.object.material[0].color.set('#2defff')
+        this.lastPick.object.material[1].color.set('#3480C4')
+      }
+      this.lastPick = undefined
+      this.lastPick = intersects.find(
+        (item) => item && item.object && (item.object as Mesh).material && ((item.object as Mesh).material as Material[]).length === 2
+      ) as Intersection<Mesh>;
+      if (this.lastPick) {
+        this.lastPick.object.material[0].color.set(0xff0000)
+        this.lastPick.object.material[1].color.set(0xff0000)
+      }
     }
 
     this.renderer.render(this.scene, this.camera);

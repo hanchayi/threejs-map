@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from 'vue'
 import ThreeJSMap from 'threejs-map'
+import { ThreeJSMapOptions } from 'threejs-map/intefaces';
+import nantong from './nantong.json';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
@@ -11,12 +13,18 @@ const textColor = ref('#fff');
 const fillColor = ref('#fff');
 const hoverColor = ref('#fff');
 const backgroundColor = ref('#fff');
+// china [104.0, 37.5] nantong [120.864608, 32.016212]
+const center = [120.864608, 32.016212]
 let map: ThreeJSMap
 
-const options = computed(() => {
+const options = computed<ThreeJSMapOptions>(() => {
   return {
     width: width.value,
     height: height.value,
+    center,
+    camera: [0, -3, 3],
+    depth: 0.5,
+    geojson: nantong as any,
     borderWidth: borderWidth.value,
     borderColor: borderColor.value,
     textColor: textColor.value,
