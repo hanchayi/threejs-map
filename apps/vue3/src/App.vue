@@ -11,7 +11,7 @@ const borderWidth = ref(1);
 const borderColor = ref('#2d8cf0');
 const textColor = ref('#fff');
 const fillColor = ref('#fff');
-const hoverColor = ref('#fff');
+const hoverColor = ref('yellow');
 const backgroundColor = ref('#fff');
 // china [104.0, 37.5] nantong [120.864608, 32.016212]
 const center = [120.864608, 32.016212]
@@ -21,6 +21,9 @@ const options = computed<ThreeJSMapOptions>(() => {
   return {
     width: width.value,
     height: height.value,
+    mapColor: 'red',
+    sideColor: 'green',
+    hoverColor: 'yellow',
     center,
     camera: [0, -3, 3],
     depth: 0.5,
@@ -29,7 +32,6 @@ const options = computed<ThreeJSMapOptions>(() => {
     borderColor: borderColor.value,
     textColor: textColor.value,
     fillColor: fillColor.value,
-    hoverColor: hoverColor.value,
     backgroundColor: backgroundColor.value
   }
 })

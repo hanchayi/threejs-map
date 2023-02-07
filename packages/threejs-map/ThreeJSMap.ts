@@ -129,14 +129,14 @@ export default class ThreeJSMap {
             extrudeSettings
           )
           const material = new MeshBasicMaterial({
-            color: '#2defff',
-            transparent: true,
-            opacity: 0.6,
+            color: this.options.mapColor,
+            // transparent: true,
+            // opacity: 0.6,
           })
           const material1 = new MeshBasicMaterial({
-            color: '#3480C4',
-            transparent: true,
-            opacity: 0.5,
+            color: this.options.sideColor,
+            // transparent: true,
+            // opacity: 0.5,
           })
 
           const mesh = new Mesh(geometry, [material, material1])
@@ -189,16 +189,16 @@ export default class ThreeJSMap {
 
       // 恢复上一次清空的
       if (this.lastPick) {
-        this.lastPick.object.material[0].color.set('#2defff')
-        this.lastPick.object.material[1].color.set('#3480C4')
+        this.lastPick.object.material[0].color.set(this.options.mapColor)
+        this.lastPick.object.material[1].color.set(this.options.sideColor)
       }
       this.lastPick = undefined
       this.lastPick = intersects.find(
         (item) => item && item.object && (item.object as Mesh).material && ((item.object as Mesh).material as Material[]).length === 2
       ) as Intersection<Mesh>;
       if (this.lastPick) {
-        this.lastPick.object.material[0].color.set(0xff0000)
-        this.lastPick.object.material[1].color.set(0xff0000)
+        this.lastPick.object.material[0].color.set(this.options.hoverColor)
+        this.lastPick.object.material[1].color.set(this.options.hoverColor)
       }
     }
 
