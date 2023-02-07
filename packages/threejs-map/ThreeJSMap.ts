@@ -4,8 +4,6 @@ import {
   PerspectiveCamera,
   WebGLRenderer,
   BufferGeometry,
-  ShapeGeometry,
-  BoxGeometry,
   Mesh,
   Object3D,
   Shape,
@@ -17,28 +15,32 @@ import {
 } from "three";
 import * as d3 from 'd3';
 import chinaJSON from '../china-map/china.json'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export default class ThreeJSMap {
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
-  private cube: Mesh;
   private map: Object3D;
+  private control: OrbitControls;
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.scene = new Scene();
     this.initCamera(options);
-    this.initRenderer(canvas, options)
+    this.initRenderer(canvas, options);
+    this.initControl(canvas);
     this.initMap();
     this.render();
   }
 
+  // 相机
   private initCamera(options: ThreeJSMapOptions) {
     this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
     this.camera.position.set(0, 0, 120);
     this.camera.lookAt(this.scene.position);
   }
 
+  // 渲染器
   private initRenderer(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     const renderer = new WebGLRenderer({
       canvas
@@ -46,6 +48,13 @@ export default class ThreeJSMap {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(options.width, options.height);
     this.renderer = renderer;
+  }
+
+  private initControl(canvas: HTMLCanvasElement) {
+    if (!this.camera || !this.renderer) {
+      throw new Error('camera and renderer must init first')
+    }
+    this.control = new OrbitControls(this.camera, canvas);
   }
 
   private initMap() {
@@ -125,9 +134,9 @@ export default class ThreeJSMap {
   }
 
   private animate() {
-    // requestAnimationFrame(() => {
-    //   this.animate();
-    // });
+    requestAnimationFrame(() => {
+      this.animate();
+    });
     this.renderer.render(this.scene, this.camera);
   }
 }
