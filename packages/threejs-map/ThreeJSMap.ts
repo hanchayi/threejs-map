@@ -73,6 +73,14 @@ export default class ThreeJSMap {
     this.control = new OrbitControls(this.camera, canvas);
   }
 
+  // 刷新配置
+  public changeOptions(options: ThreeJSMapOptions) {
+    this.options = options;
+    this.scene.clear();
+    this.initMap();
+  }
+
+  // 初始化地图
   private initMap() {
     this.map = new Object3D();
     // 魔卡托投影变换
@@ -92,7 +100,8 @@ export default class ThreeJSMap {
         polygons.forEach(polygon => {
           const shape = new Shape();
           const lineMaterial = new LineBasicMaterial({
-            color: 'white'
+            color: this.options.borderColor || 'white',
+            linewidth: Number(this.options.borderWidth) || 1
           })
 
           const points: Vector3[] = [];
@@ -137,8 +146,6 @@ export default class ThreeJSMap {
           province.add(line)
         })
       })
-
-
 
       map.add(province);
       this.scene.add(map);

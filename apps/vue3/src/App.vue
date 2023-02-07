@@ -1,25 +1,53 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import ThreeJSMap from 'threejs-map'
 
 const canvas = ref<HTMLCanvasElement | null>(null)
-const width = ref(1000)
-const height = ref(800)
+const width = ref(800);
+const height = ref(600);
+const borderWidth = ref(1);
+const borderColor = ref('#2d8cf0');
+const textColor = ref('#fff');
+const fillColor = ref('#fff');
+const hoverColor = ref('#fff');
+const backgroundColor = ref('#fff');
+let map: ThreeJSMap
+
+const options = computed(() => {
+  return {
+    width: width.value,
+    height: height.value,
+    borderWidth: borderWidth.value,
+    borderColor: borderColor.value,
+    textColor: textColor.value,
+    fillColor: fillColor.value,
+    hoverColor: hoverColor.value,
+    backgroundColor: backgroundColor.value
+  }
+})
+
+function fresh() {
+  map.changeOptions(options.value)
+}
 
 onMounted(() => {
   nextTick(() => {
     if (canvas.value) {
-      const map = new ThreeJSMap(canvas.value, {
-        width: width.value,
-        height: height.value,
-      })
+      map = new ThreeJSMap(canvas.value, options.value)
     }
   })
 })
 </script>
 
 <template>
-  <canvas ref="canvas" :width="width" :height="height" />
+  <div>
+    <div>
+      边框粗细<input v-model="borderWidth" @change="fresh"/>
+      边框颜色<input v-model="borderColor" @change="fresh"/>
+    </div>
+    <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
+  </div>
+
 </template>
 
 <style scoped>
