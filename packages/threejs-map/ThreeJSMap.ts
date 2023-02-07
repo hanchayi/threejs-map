@@ -27,19 +27,29 @@ export default class ThreeJSMap {
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.scene = new Scene();
-    this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
-    const renderer = new WebGLRenderer({
-      canvas
-    });
-    renderer.setSize(options.width, options.height);
-    this.renderer = renderer;
-    this.camera.position.z = 5;
-    this.map = new Object3D();
+    this.initCamera(options);
+    this.initRenderer(canvas, options)
     this.initMap();
     this.render();
   }
 
+  private initCamera(options: ThreeJSMapOptions) {
+    this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
+    this.camera.position.set(0, 0, 120);
+    this.camera.lookAt(this.scene.position);
+  }
+
+  private initRenderer(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
+    const renderer = new WebGLRenderer({
+      canvas
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(options.width, options.height);
+    this.renderer = renderer;
+  }
+
   private initMap() {
+    this.map = new Object3D();
     // 魔卡托投影变换
     const projection = d3
       .geoMercator()
@@ -80,25 +90,25 @@ export default class ThreeJSMap {
             bevelSegments: 1
           }
 
-          // const geometry = new ExtrudeGeometry(
-          //   shape,
-          //   extrudeSettings
-          // )
-          // const material = new MeshBasicMaterial({
-          //   color: '#2defff',
-          //   transparent: true,
-          //   opacity: 0.6,
-          // })
-          // const material1 = new MeshBasicMaterial({
-          //   color: '#3480C4',
-          //   transparent: true,
-          //   opacity: 0.5,
-          // })
+          const geometry = new ExtrudeGeometry(
+            shape,
+            extrudeSettings
+          )
+          const material = new MeshBasicMaterial({
+            color: '#2defff',
+            transparent: true,
+            opacity: 0.6,
+          })
+          const material1 = new MeshBasicMaterial({
+            color: '#3480C4',
+            transparent: true,
+            opacity: 0.5,
+          })
 
-          // const mesh = new Mesh(geometry, [material, material1])
+          const mesh = new Mesh(geometry, [material, material1])
           const lineGeometry = new BufferGeometry().setFromPoints( points );
           const line = new Line(lineGeometry, lineMaterial)
-          // province.add(mesh)
+          province.add(mesh)
           province.add(line)
         })
       })
