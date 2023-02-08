@@ -16,9 +16,14 @@ import {
   Vector2,
   Intersection,
   Material,
+  DoubleSide,
+  ShapeGeometry,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
 
 export default class ThreeJSMap {
   private canvas: HTMLCanvasElement;
@@ -33,6 +38,7 @@ export default class ThreeJSMap {
   private onMouseMove: (event: MouseEvent) => void;
   private rect: DOMRect;
   private lastPick?: Intersection<Mesh>;
+  private font?: Font;
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.canvas = canvas;
@@ -42,8 +48,8 @@ export default class ThreeJSMap {
     this.initCamera(options);
     this.initRenderer(canvas, options);
     this.initControl(canvas);
-    this.initMap();
     this.initRaycaster();
+    this.font = new Font(font);
     this.render();
   }
 
@@ -147,6 +153,15 @@ export default class ThreeJSMap {
         })
       })
 
+
+      const [ x, y ] = projection(elem.properties.center) as any;
+      const name = elem.properties.name;
+      const text = this.createText(name);
+      text.position.x = x;
+      text.position.y = y;
+      text.position.z = this.options.depth + 0.1;
+      province.add(text)
+
       map.add(province);
       this.scene.add(map);
     })
@@ -165,11 +180,72 @@ export default class ThreeJSMap {
     this.canvas.addEventListener('mousemove', this.onMouseMove, false)
   }
 
+  private createText(text) {
+    console.log('createText', text)
+    if (!this.font) {
+      throw new Error('no font init')
+    }
+
+    const color = 0x006699;
+    const matMark = new LineBasicMaterial({
+      color,
+      side: DoubleSide
+    })
+    const matLite = new LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.4,
+      side: DoubleSide,
+    })
+    const shapes = this.font.generateShapes(text, 0.1)
+    const geo = new ShapeGeometry(shapes)
+    geo.computeBoundingBox()
+    const boundingBox = geo.boundingBox;
+
+    if (!boundingBox) {
+      throw new Error('no boundingBox')
+    }
+
+    const xMid = - 0.5 * ( boundingBox.max.x - boundingBox.min.x );
+    geo.translate( xMid, 0, 0 );
+    const mesh = new Mesh(geo, matLite);
+    return mesh
+  }
+
+  // private createText(text: string, options: {
+  //   font: Font;
+  //   size: number;
+  //   height: number;
+  //   curveSegments: number;
+  //   bevelEnabled: boolean;
+  //   bevelThickness: number;
+  //   bevelSize: number;
+  //   bevelOffset: number;
+  //   bevelSegments: number;
+  // }) {
+  //   const textGeo = new TextGeometry(text, options);
+  //   textGeo.computeBoundingBox();
+  //   const boundingBox = textGeo.boundingBox;
+
+  //   const materials = [
+  //     new MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+  //     new MeshPhongMaterial( { color: 0xffffff } ) // side
+  //   ];
+
+  //   if (!boundingBox) {
+  //     return;
+  //   }
+
+  //   const centerOffset = - 0.5 * ( boundingBox.max.x - boundingBox.min.x );
+  //   textMesh = new Mesh( textGeo, materials );
+  // }
+
   public destroy() {
     this.canvas.removeEventListener('mousemove', this.onMouseMove)
   }
 
-  private render() {
+  public render() {
+    this.initMap();
     this.animate();
   }
 

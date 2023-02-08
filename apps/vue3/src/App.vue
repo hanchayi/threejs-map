@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick, computed } from 'vue'
 import ThreeJSMap from 'threejs-map'
 import { ThreeJSMapOptions } from 'threejs-map/intefaces';
-import nantong from './nantong.json';
+import nantong from 'geo/nantong.json';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
@@ -24,6 +24,7 @@ const options = computed<ThreeJSMapOptions>(() => {
     mapColor: 'red',
     sideColor: 'green',
     hoverColor: 'yellow',
+    fontUrl: 'HarmonyOS Sans SC_Regular.json',
     center,
     camera: [0, -3, 3],
     depth: 0.5,

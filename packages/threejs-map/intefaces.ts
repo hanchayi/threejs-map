@@ -9,6 +9,10 @@ export interface ThreeJSMapOptions {
   hoverColor?: string; // 鼠标经过的颜色
   geojson: {  // 地图数据
     features: Array<{
+      properties: {
+        name: string;
+        center: [number, number];
+      },
       geometry: {
         coordinates: Array<Array<[number, number]>>
       }

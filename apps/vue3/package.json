@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "vue": "^3.2.45",
-    "threejs-map": "workspace:*"
+    "threejs-map": "workspace:*",
+    "geo": "workspace:*",
+    "font": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
