@@ -158,7 +158,7 @@ export default class ThreeJSMap {
       const name = elem.properties.name;
       const text = this.createText(name);
       text.position.x = x;
-      text.position.y = y;
+      text.position.y = -y;
       text.position.z = this.options.depth + 0.1;
       province.add(text)
 
@@ -207,7 +207,8 @@ export default class ThreeJSMap {
     }
 
     const xMid = - 0.5 * ( boundingBox.max.x - boundingBox.min.x );
-    geo.translate( xMid, 0, 0 );
+    const yMid = - 0.5 * ( boundingBox.max.y - boundingBox.min.y );
+    geo.translate( xMid, yMid, 0 );
     const mesh = new Mesh(geo, matLite);
     return mesh
   }
