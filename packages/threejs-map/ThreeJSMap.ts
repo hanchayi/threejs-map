@@ -46,7 +46,7 @@ export default class ThreeJSMap {
   private lastPick?: Intersection<Mesh>;
   private font?: Font;
   private texts: Mesh[];
-  private pyramids: Mesh[] = [];
+  private pyramids: Object3D[] = [];
   private clock: Clock;
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
@@ -177,17 +177,25 @@ export default class ThreeJSMap {
       this.texts.push(text);
       province.add(text)
 
-      const [ pyramid1, pyramid2 ] = this.createPyramid()
-      pyramid1.position.set(x, -y, this.options.depth + 0.2)
-      pyramid2.position.set(x, -y, this.options.depth + 0.1)
-      province.add(pyramid1)
-      province.add(pyramid2)
+      const [ pyramid, pyramid1, pyramid2 ] = this.createPyramid()
+      pyramid1.position.set(x, -y, this.pyramidTopZ)
+      pyramid2.position.set(x, -y, this.pyramidBottomZ)
+      province.add(pyramid)
+      // province.add(pyramid2)
       this.pyramids.push(pyramid1)
       this.pyramids.push(pyramid2)
 
       map.add(province);
       this.scene.add(map);
     })
+  }
+
+  private get pyramidTopZ() {
+    return this.options.depth + 0.3
+  }
+
+  private get pyramidBottomZ() {
+    return this.options.depth + 0.15
   }
 
   // 射线追踪
@@ -229,13 +237,15 @@ export default class ThreeJSMap {
    * @memberof ThreeJSMap
    */
   private createPyramid() {
-    const pyramidGeometry = new CylinderGeometry( 0, 0.1, 0.1, 4);
+    const pyramid = new Object3D();
     const pyramidMaterial = new MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
-    const pyramid1 = new Mesh( pyramidGeometry, pyramidMaterial );
-    pyramid1.rotation.x = 90
-    const pyramid2 = new Mesh( pyramidGeometry, pyramidMaterial );
-    pyramid2.rotation.x = -90
-    return [ pyramid1, pyramid2 ];
+    const pyramid1 = new Mesh( new CylinderGeometry( 0, 0.1, 0.1, 4), pyramidMaterial );
+    pyramid1.rotation.x = Math.PI / 2
+    const pyramid2 = new Mesh( new CylinderGeometry( 0, 0.1, 0.2, 4), pyramidMaterial );
+    pyramid2.rotation.x = -Math.PI / 2
+    pyramid.add(pyramid1)
+    pyramid.add(pyramid2)
+    return [ pyramid, pyramid1, pyramid2 ];
   }
 
   /**
@@ -295,7 +305,11 @@ export default class ThreeJSMap {
     const delta = this.clock.getDelta();
 
     this.pyramids.forEach((pyramid) => {
-      pyramid.rotation.z += 1.0 * delta;
+      if (pyramid.position.z === this.pyramidTopZ) {
+        pyramid.rotation.y += 1.0 * delta;
+      } else {
+        pyramid.rotation.y -= 1.0 * delta;
+      }
     })
 
     // 让字体应用相机旋转角度
