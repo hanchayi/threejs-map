@@ -19,6 +19,7 @@ let map: ThreeJSMap
 
 const options = computed<ThreeJSMapOptions>(() => {
   return {
+    debug: true,
     width: width.value,
     height: height.value,
     mapColor: 'red',

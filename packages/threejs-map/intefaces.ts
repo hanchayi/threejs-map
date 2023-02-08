@@ -1,4 +1,5 @@
 export interface ThreeJSMapOptions {
+  debug?: boolean;
   width: number;
   height: number;
   center: number[]; // 地图中心经纬度

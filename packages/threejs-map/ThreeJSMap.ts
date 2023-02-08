@@ -18,6 +18,12 @@ import {
   Material,
   DoubleSide,
   ShapeGeometry,
+  CylinderGeometry,
+  MeshPhongMaterial,
+  BoxGeometry,
+  MeshLambertMaterial,
+  AxesHelper,
+  Clock,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -40,22 +46,28 @@ export default class ThreeJSMap {
   private lastPick?: Intersection<Mesh>;
   private font?: Font;
   private texts: Mesh[];
+  private pyramids: Mesh[] = [];
+  private clock: Clock;
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.canvas = canvas;
     this.rect = canvas.getBoundingClientRect();
     this.options = options;
     this.scene = new Scene();
-    this.initCamera(options);
+    this.initCamera();
     this.initRenderer(canvas, options);
     this.initControl(canvas);
     this.initRaycaster();
+    // this.initGround();
+    this.initAxis();
     this.font = new Font(font);
+    this.clock = new Clock()
     this.render();
   }
 
   // 相机
-  private initCamera(options: ThreeJSMapOptions) {
+  private initCamera() {
+    const { options } = this;
     this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
     const [ x, y, z ] = this.options.camera
     this.camera.position.set(x, y, z);
@@ -91,6 +103,7 @@ export default class ThreeJSMap {
   private initMap() {
     this.map = new Object3D();
     this.texts = []
+    this.pyramids = [];
     // 魔卡托投影变换
     const projection = d3
       .geoMercator()
@@ -157,13 +170,20 @@ export default class ThreeJSMap {
 
 
       const [ x, y ] = projection(elem.properties.center) as any;
+
       const name = elem.properties.name;
       const text = this.createText(name);
-      text.position.x = x;
-      text.position.y = -y;
-      text.position.z = this.options.depth + 0.1;
+      text.position.set(x, -y, this.options.depth + 0.1)
       this.texts.push(text);
       province.add(text)
+
+      const [ pyramid1, pyramid2 ] = this.createPyramid()
+      pyramid1.position.set(x, -y, this.options.depth + 0.2)
+      pyramid2.position.set(x, -y, this.options.depth + 0.1)
+      province.add(pyramid1)
+      province.add(pyramid2)
+      this.pyramids.push(pyramid1)
+      this.pyramids.push(pyramid2)
 
       map.add(province);
       this.scene.add(map);
@@ -183,6 +203,49 @@ export default class ThreeJSMap {
     this.canvas.addEventListener('mousemove', this.onMouseMove, false)
   }
 
+  // 地面
+  private initGround() {
+    const groundGeometry = new BoxGeometry( 10, 10, 10);
+    const groundMaterial = new MeshLambertMaterial( { color: 'white' } );
+    const groundMesh = new Mesh( groundGeometry, groundMaterial );
+    groundMesh.position.z = -1;
+    this.scene.add( groundMesh );
+
+  }
+
+  //
+  private initAxis() {
+    if (!this.options.debug) {
+      return
+    }
+    const axesHelper = new AxesHelper( 5 );
+    this.scene.add( axesHelper );
+  }
+
+  /**
+   * 创建一个金字塔形状
+   *
+   * @private
+   * @memberof ThreeJSMap
+   */
+  private createPyramid() {
+    const pyramidGeometry = new CylinderGeometry( 0, 0.1, 0.1, 4);
+    const pyramidMaterial = new MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
+    const pyramid1 = new Mesh( pyramidGeometry, pyramidMaterial );
+    pyramid1.rotation.x = 90
+    const pyramid2 = new Mesh( pyramidGeometry, pyramidMaterial );
+    pyramid2.rotation.x = -90
+    return [ pyramid1, pyramid2 ];
+  }
+
+  /**
+   * 创建一个中文文本
+   *
+   * @private
+   * @param {*} text
+   * @returns
+   * @memberof ThreeJSMap
+   */
   private createText(text) {
     if (!this.font) {
       throw new Error('no font init')
@@ -215,34 +278,6 @@ export default class ThreeJSMap {
     return mesh
   }
 
-  // private createText(text: string, options: {
-  //   font: Font;
-  //   size: number;
-  //   height: number;
-  //   curveSegments: number;
-  //   bevelEnabled: boolean;
-  //   bevelThickness: number;
-  //   bevelSize: number;
-  //   bevelOffset: number;
-  //   bevelSegments: number;
-  // }) {
-  //   const textGeo = new TextGeometry(text, options);
-  //   textGeo.computeBoundingBox();
-  //   const boundingBox = textGeo.boundingBox;
-
-  //   const materials = [
-  //     new MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-  //     new MeshPhongMaterial( { color: 0xffffff } ) // side
-  //   ];
-
-  //   if (!boundingBox) {
-  //     return;
-  //   }
-
-  //   const centerOffset = - 0.5 * ( boundingBox.max.x - boundingBox.min.x );
-  //   textMesh = new Mesh( textGeo, materials );
-  // }
-
   public destroy() {
     this.canvas.removeEventListener('mousemove', this.onMouseMove)
   }
@@ -256,6 +291,12 @@ export default class ThreeJSMap {
     requestAnimationFrame(() => {
       this.animate();
     });
+
+    const delta = this.clock.getDelta();
+
+    this.pyramids.forEach((pyramid) => {
+      pyramid.rotation.z += 1.0 * delta;
+    })
 
     // 让字体应用相机旋转角度
     this.texts.forEach(text => {
