@@ -39,6 +39,7 @@ export default class ThreeJSMap {
   private rect: DOMRect;
   private lastPick?: Intersection<Mesh>;
   private font?: Font;
+  private texts: Mesh[];
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.canvas = canvas;
@@ -89,6 +90,7 @@ export default class ThreeJSMap {
   // 初始化地图
   private initMap() {
     this.map = new Object3D();
+    this.texts = []
     // 魔卡托投影变换
     const projection = d3
       .geoMercator()
@@ -160,6 +162,7 @@ export default class ThreeJSMap {
       text.position.x = x;
       text.position.y = -y;
       text.position.z = this.options.depth + 0.1;
+      this.texts.push(text);
       province.add(text)
 
       map.add(province);
@@ -181,12 +184,11 @@ export default class ThreeJSMap {
   }
 
   private createText(text) {
-    console.log('createText', text)
     if (!this.font) {
       throw new Error('no font init')
     }
 
-    const color = 0x006699;
+    const color = 0xffffff;
     const matMark = new LineBasicMaterial({
       color,
       side: DoubleSide
@@ -194,7 +196,7 @@ export default class ThreeJSMap {
     const matLite = new LineBasicMaterial({
       color,
       transparent: true,
-      opacity: 0.4,
+      // opacity: 0.4,
       side: DoubleSide,
     })
     const shapes = this.font.generateShapes(text, 0.1)
@@ -254,6 +256,12 @@ export default class ThreeJSMap {
     requestAnimationFrame(() => {
       this.animate();
     });
+
+    // 让字体应用相机旋转角度
+    this.texts.forEach(text => {
+      text.rotation.copy( this.camera.rotation );
+      text.updateMatrix();
+    })
 
     if (this.mouse) {
       // 通过摄像机和鼠标位置更新射线
