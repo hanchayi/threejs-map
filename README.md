@@ -29,6 +29,9 @@ https://font.qqe2.com/ 在线预览字体
 字体子集化 https://www.npmjs.com/package/fontmin
 
 
+## 线形问题
+https://blog.csdn.net/wclwksn2019/article/details/125496544
+
 ## reference
 
 [3d可视化地图](https://juejin.cn/post/6980983551399788580)

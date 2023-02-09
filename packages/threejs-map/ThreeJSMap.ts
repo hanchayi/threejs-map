@@ -35,6 +35,9 @@ import {
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
 import mapUrl from './map.png'
@@ -189,25 +192,17 @@ export default class ThreeJSMap {
 
     const city = this.city;
 
-    const areaBottom = this.createArea(city.geometry.coordinates, {
-      z: 0,
-      depth: 0.005,
-      shapeMaterial: new MeshBasicMaterial({
-        transparent: true,
-        opacity: 0,
-      }),
-      borderColor: '#96F0EF'
+    const areaBottom = this.createLine(city.geometry.coordinates, {
+      z: -this.options.depth / 2,
+      width: 1.2,
+      color: 0x96F0EF,
     })
     this.scene.add(areaBottom);
 
-    const areaMiddle = this.createArea(city.geometry.coordinates, {
-      z: this.options.depth / 2,
-      depth: 0.005,
-      shapeMaterial: new MeshBasicMaterial({
-        transparent: true,
-        opacity: 0,
-      }),
-      borderColor: '#70D7FC',
+    const areaMiddle = this.createLine(city.geometry.coordinates, {
+      z: -this.options.depth / 4,
+      width: 1.2,
+      color: 0x70D7FC,
     })
     this.scene.add(areaMiddle);
   }
@@ -271,6 +266,42 @@ export default class ThreeJSMap {
       })
     })
 
+    return area;
+  }
+
+  private createLine(coordinates, options: {
+    z: number,
+    color: number,
+    width: number,
+  }) {
+    console.log('createLine', options)
+    const area = new Object3D();
+    // 坐标数组
+    coordinates.forEach(polygons => {
+      polygons.forEach(polygon => {
+        const points: Vector3[] = [];
+        const pointArr: number[] = [];
+        for (let i = 0; i < polygon.length; i++) {
+          const [x, y] = this.projection(polygon[i] as any) as any
+          points.push(new Vector3(x, -y, this.options.depth));
+          pointArr.push(x, -y, this.options.depth)
+        }
+
+        const lineGeometry = new LineGeometry();
+        lineGeometry.setPositions(pointArr);
+        const lineMaterial = new LineMaterial({
+          color: options.color,
+          linewidth: options.width,
+          vertexColors: false,
+        })
+        lineMaterial.resolution.set(this.options.width, this.options.height);
+        let buildoutline = new LineSegments2(lineGeometry, lineMaterial);
+        buildoutline.position.z = options.z
+        area.add(buildoutline)
+      })
+    })
+
+    area.position.z = options.z
     return area;
   }
 
