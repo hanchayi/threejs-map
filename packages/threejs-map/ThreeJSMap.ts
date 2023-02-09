@@ -26,6 +26,7 @@ import {
   Clock,
   TextureLoader,
   RepeatWrapping,
+  PlaneGeometry,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -33,6 +34,7 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
 import mapUrl from './map.png'
+import groundUrl from './ground.png'
 import jiangsu from 'geo/jiangsu.json'
 
 
@@ -92,7 +94,6 @@ export default class ThreeJSMap {
     this.initRenderer(canvas, options);
     this.initControl(canvas);
     this.initRaycaster();
-    // this.initGround();
     this.initAxis();
     this.font = new Font(font);
     this.clock = new Clock()
@@ -310,8 +311,6 @@ export default class ThreeJSMap {
     return area;
   }
 
-
-
   // 射线追踪
   private initRaycaster() {
     this.raycaster = new Raycaster();
@@ -327,12 +326,26 @@ export default class ThreeJSMap {
 
   // 地面
   private initGround() {
-    const groundGeometry = new BoxGeometry( 10, 10, 10);
-    const groundMaterial = new MeshLambertMaterial( { color: 'white' } );
-    const groundMesh = new Mesh( groundGeometry, groundMaterial );
-    groundMesh.position.z = -1;
-    this.scene.add( groundMesh );
+    // const groundGeometry = new BoxGeometry( 10, 10, 10);
+    // const groundMaterial = new MeshBasicMaterial( { color: 'white' } );
+    // const groundMesh = new Mesh( groundGeometry, groundMaterial );
+    // groundMesh.position.z = -1;
+    // this.scene.add( groundMesh );
+    const texture = new TextureLoader().load( groundUrl );
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.repeat.set( 8, 8 );
 
+    const material = new MeshBasicMaterial({
+      map: texture,
+      // color: this.options.mapColor,
+      transparent: true,
+      opacity: 0.9,
+    })
+    const geometry = new PlaneGeometry( 20, 20 );
+    // const material = new MeshBasicMaterial( {color: 0xffff00, side: DoubleSide} );
+    const plane = new Mesh( geometry, material );
+    this.scene.add( plane );
   }
 
   // axis tool
@@ -407,6 +420,7 @@ export default class ThreeJSMap {
   }
 
   public render() {
+    this.initGround();
     this.initMap();
     this.animate();
   }
