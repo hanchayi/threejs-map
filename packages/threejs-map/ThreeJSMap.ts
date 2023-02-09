@@ -27,6 +27,10 @@ import {
   TextureLoader,
   RepeatWrapping,
   PlaneGeometry,
+  sRGBEncoding,
+  AmbientLight,
+  DirectionalLight,
+  MeshStandardMaterial,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -90,6 +94,7 @@ export default class ThreeJSMap {
     this.rect = canvas.getBoundingClientRect();
     this.options = options;
     this.scene = new Scene();
+
     this.initCamera();
     this.initRenderer(canvas, options);
     this.initControl(canvas);
@@ -143,67 +148,24 @@ export default class ThreeJSMap {
 
     const geojson = this.options.geojson;
     geojson.features.forEach((elem) => {
-      const province = new Object3D();
+      const texture = new TextureLoader().load( mapUrl );
+      texture.wrapS = RepeatWrapping;
+      texture.wrapT = RepeatWrapping;
+      texture.repeat.set( 0.3, 0.3 );
 
-      // 坐标数组
-      const coordinates = elem.geometry.coordinates;
-      coordinates.forEach(polygons => {
-        polygons.forEach(polygon => {
-          const shape = new Shape();
-
-          const lineMaterial = new LineBasicMaterial({
-            color: this.options.borderColor || 'white',
-            linewidth: Number(this.options.borderWidth) || 1
-          })
-
-          const points: Vector3[] = [];
-          for (let i = 0; i < polygon.length; i++) {
-            const [x, y] = this.projection(polygon[i] as any) as any
-            if (i === 0) {
-              shape.moveTo(x, -y)
-            }
-            shape.lineTo(x, -y);
-            points.push(new Vector3(x, -y, this.options.depth));
-          }
-
-          const texture = new TextureLoader().load( mapUrl );
-          texture.wrapS = RepeatWrapping;
-          texture.wrapT = RepeatWrapping;
-          texture.repeat.set( 0.3, 0.3 );
-
-          const material = new MeshBasicMaterial({
-            map: texture,
-            // color: this.options.mapColor,
-            transparent: true,
-            opacity: 0.9,
-          })
-          const material1 = new MeshBasicMaterial({
-            color: this.options.sideColor,
-            transparent: true,
-            // opacity: 0,
-          })
-
-          const mesh = new Mesh(new ExtrudeGeometry(
-            shape,
-            {
-              depth: 0.1,
-              bevelEnabled: false,
-              steps: 9,
-              bevelThickness: 1,
-              bevelSize: 1,
-              bevelOffset: 0,
-              bevelSegments: 3
-            }
-          ), [material, material1])
-          province.add(mesh);
-          mesh.position.z = this.options.depth;
-
-          const lineGeometry = new BufferGeometry().setFromPoints( points );
-          const line = new Line(lineGeometry, lineMaterial)
-          province.add(line)
-        })
+      const material = new MeshStandardMaterial({
+        map: texture,
+        // color: this.options.mapColor,
+        transparent: true,
+        opacity: 0.65,
       })
 
+      const province = this.createArea(elem.geometry.coordinates, {
+        z: this.options.depth,
+        depth: 0.005,
+        shapeMaterial: material,
+        borderColor: '#85BFEF'
+      })
 
       const [ x, y ] = this.projection(elem.properties.center) as any;
 
@@ -226,6 +188,7 @@ export default class ThreeJSMap {
     })
 
     const city = this.city;
+
     const areaBottom = this.createArea(city.geometry.coordinates, {
       z: 0,
       depth: 0.005,
@@ -233,9 +196,7 @@ export default class ThreeJSMap {
         transparent: true,
         opacity: 0,
       }),
-      sideMaterial: new MeshBasicMaterial({
-        color: 'white',
-      }),
+      borderColor: '#96F0EF'
     })
     this.scene.add(areaBottom);
 
@@ -246,9 +207,7 @@ export default class ThreeJSMap {
         transparent: true,
         opacity: 0,
       }),
-      sideMaterial: new MeshBasicMaterial({
-        color: 'white',
-      }),
+      borderColor: '#70D7FC',
     })
     this.scene.add(areaMiddle);
   }
@@ -264,7 +223,7 @@ export default class ThreeJSMap {
     z: number,
     depth: number,
     shapeMaterial: Material,
-    sideMaterial: Material,
+    borderColor: string,
   }) {
     const area = new Object3D();
     // 坐标数组
@@ -273,8 +232,10 @@ export default class ThreeJSMap {
         const shape = new Shape();
 
         const lineMaterial = new LineBasicMaterial({
-          color: this.options.borderColor || 'white',
-          linewidth: Number(this.options.borderWidth) || 1
+          // color: this.options.borderColor || 'white',
+          color: options.borderColor,
+          // linewidth: Number(options.borderColor) || 1
+          linewidth: 2
         })
 
         const points: Vector3[] = [];
@@ -298,7 +259,9 @@ export default class ThreeJSMap {
             bevelOffset: 0,
             bevelSegments: 3
           }
-        ), [options.shapeMaterial, options.sideMaterial])
+        ), [options.shapeMaterial, new MeshBasicMaterial({
+          color: options.borderColor
+        })])
         area.add(mesh);
         mesh.position.z = options.z;
 
@@ -340,7 +303,7 @@ export default class ThreeJSMap {
       map: texture,
       // color: this.options.mapColor,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.5,
     })
     const geometry = new PlaneGeometry( 20, 20 );
     // const material = new MeshBasicMaterial( {color: 0xffff00, side: DoubleSide} );
@@ -350,6 +313,7 @@ export default class ThreeJSMap {
 
   // axis tool
   private initAxis() {
+    return
     if (!this.options.debug) {
       return
     }
@@ -365,7 +329,7 @@ export default class ThreeJSMap {
    */
   private createPyramid() {
     const pyramid = new Object3D();
-    const pyramidMaterial = new MeshPhongMaterial( { color: '#1DBAA9' } );
+    const pyramidMaterial = new MeshBasicMaterial( { color: '#1DBAA9', transparent: true, opacity: 0.8 } );
     const pyramid1 = new Mesh( new CylinderGeometry( 0, 0.1, 0.1, 4), pyramidMaterial );
     pyramid1.rotation.x = Math.PI / 2
     const pyramid2 = new Mesh( new CylinderGeometry( 0, 0.1, 0.2, 4), pyramidMaterial );
@@ -420,8 +384,13 @@ export default class ThreeJSMap {
   }
 
   public render() {
+    const light = new AmbientLight( 0xffffff, 1.8 ); // soft white light
+    this.scene.add( light );
+    // const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
+    // this.scene.add( directionalLight );
     this.initGround();
     this.initMap();
+
     this.animate();
   }
 
