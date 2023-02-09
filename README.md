@@ -8,6 +8,9 @@ http://36.156.159.239:10000/9uBtlhzIssyIdEvy/
 http://datav.aliyun.com/portal/school/atlas/area_selector
 
 
+## 物体相对于摄像机静止
+https://blog.csdn.net/mu399/article/details/94723921
+
 ## 中文字体
 
 这是官方的[文本](https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_text_shapes.html)示例

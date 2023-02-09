@@ -167,7 +167,8 @@ export default class ThreeJSMap {
         z: this.options.depth,
         depth: 0.005,
         shapeMaterial: material,
-        borderColor: '#85BFEF'
+        borderColor: 0x85BFEF,
+        borderWidth: 2
       })
 
       const [ x, y ] = this.projection(elem.properties.center) as any;
@@ -218,22 +219,16 @@ export default class ThreeJSMap {
     z: number,
     depth: number,
     shapeMaterial: Material,
-    borderColor: string,
+    borderColor: number,
+    borderWidth: number,
   }) {
     const area = new Object3D();
     // 坐标数组
     coordinates.forEach(polygons => {
       polygons.forEach(polygon => {
         const shape = new Shape();
-
-        const lineMaterial = new LineBasicMaterial({
-          // color: this.options.borderColor || 'white',
-          color: options.borderColor,
-          // linewidth: Number(options.borderColor) || 1
-          linewidth: 2
-        })
-
         const points: Vector3[] = [];
+        const pointArr: number[] = [];
         for (let i = 0; i < polygon.length; i++) {
           const [x, y] = this.projection(polygon[i] as any) as any
           if (i === 0) {
@@ -241,6 +236,7 @@ export default class ThreeJSMap {
           }
           shape.lineTo(x, -y);
           points.push(new Vector3(x, -y, this.options.depth));
+          pointArr.push(x, -y, this.options.depth)
         }
 
         const mesh = new Mesh(new ExtrudeGeometry(
@@ -260,9 +256,17 @@ export default class ThreeJSMap {
         area.add(mesh);
         mesh.position.z = options.z;
 
-        const lineGeometry = new BufferGeometry().setFromPoints( points );
-        const line = new Line(lineGeometry, lineMaterial)
-        area.add(line)
+        const lineGeometry = new LineGeometry();
+        lineGeometry.setPositions(pointArr);
+        const lineMaterial = new LineMaterial({
+          color: options.borderColor,
+          linewidth: options.borderWidth,
+          vertexColors: false,
+        })
+        lineMaterial.resolution.set(this.options.width, this.options.height);
+        let buildoutline = new LineSegments2(lineGeometry, lineMaterial);
+        buildoutline.position.z = 0.01
+        area.add(buildoutline)
       })
     })
 
@@ -274,16 +278,13 @@ export default class ThreeJSMap {
     color: number,
     width: number,
   }) {
-    console.log('createLine', options)
     const area = new Object3D();
     // 坐标数组
     coordinates.forEach(polygons => {
       polygons.forEach(polygon => {
-        const points: Vector3[] = [];
         const pointArr: number[] = [];
         for (let i = 0; i < polygon.length; i++) {
           const [x, y] = this.projection(polygon[i] as any) as any
-          points.push(new Vector3(x, -y, this.options.depth));
           pointArr.push(x, -y, this.options.depth)
         }
 
