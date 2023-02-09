@@ -45,11 +45,13 @@ importers:
       '@types/three': ^0.149.0
       d3: ^7.8.2
       font: workspace:*
+      geo: workspace:*
       three: ^0.149.0
     dependencies:
       '@types/d3': registry.npmmirror.com/@types/d3/7.4.0
       d3: registry.npmmirror.com/d3/7.8.2
       font: link:../font
+      geo: link:../geo
       three: registry.npmmirror.com/three/0.149.0
     devDependencies:
       '@types/three': registry.npmmirror.com/@types/three/0.149.0

@@ -24,12 +24,17 @@ import {
   MeshLambertMaterial,
   AxesHelper,
   Clock,
+  TextureLoader,
+  RepeatWrapping,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
+import mapUrl from './map.png'
+import jiangsu from 'geo/jiangsu.json'
+
 
 export default class ThreeJSMap {
   private canvas: HTMLCanvasElement;
@@ -48,6 +53,35 @@ export default class ThreeJSMap {
   private texts: Mesh[];
   private pyramids: Object3D[] = [];
   private clock: Clock;
+
+  private get pyramidTopZ() {
+    return this.options.depth + 0.3
+  }
+
+  private get pyramidBottomZ() {
+    return this.options.depth + 0.15
+  }
+
+  private get city() {
+    const city = jiangsu.features.find(f => f.properties.adcode === 320600)
+
+    if (!city) {
+      throw new Error('city not found')
+    }
+    return city
+  }
+
+  private get center() {
+    return this.city.properties.center;
+  }
+
+  private get projection() {
+    const projection = d3
+      .geoMercator()
+      .center(this.center as [number, number])
+      .translate([0, 0])
+    return projection;
+  }
 
   constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
     this.canvas = canvas;
@@ -104,11 +138,6 @@ export default class ThreeJSMap {
     this.map = new Object3D();
     this.texts = []
     this.pyramids = [];
-    // 魔卡托投影变换
-    const projection = d3
-      .geoMercator()
-      .center(this.options.center as [number, number])
-      .translate([0, 0])
     const map = this.map;
 
     const geojson = this.options.geojson;
@@ -120,6 +149,7 @@ export default class ThreeJSMap {
       coordinates.forEach(polygons => {
         polygons.forEach(polygon => {
           const shape = new Shape();
+
           const lineMaterial = new LineBasicMaterial({
             color: this.options.borderColor || 'white',
             linewidth: Number(this.options.borderWidth) || 1
@@ -127,7 +157,7 @@ export default class ThreeJSMap {
 
           const points: Vector3[] = [];
           for (let i = 0; i < polygon.length; i++) {
-            const [x, y] = projection(polygon[i] as any) as any
+            const [x, y] = this.projection(polygon[i] as any) as any
             if (i === 0) {
               shape.moveTo(x, -y)
             }
@@ -135,41 +165,46 @@ export default class ThreeJSMap {
             points.push(new Vector3(x, -y, this.options.depth));
           }
 
-          const extrudeSettings = {
-            depth: this.options.depth,
-            bevelEnabled: false,
-            steps: 2,
-            bevelThickness: 1,
-            bevelSize: 1,
-            bevelOffset: 0,
-            bevelSegments: 1
-          }
+          const texture = new TextureLoader().load( mapUrl );
+          texture.wrapS = RepeatWrapping;
+          texture.wrapT = RepeatWrapping;
+          texture.repeat.set( 0.3, 0.3 );
 
-          const geometry = new ExtrudeGeometry(
-            shape,
-            extrudeSettings
-          )
           const material = new MeshBasicMaterial({
-            color: this.options.mapColor,
-            // transparent: true,
-            // opacity: 0.6,
+            map: texture,
+            // color: this.options.mapColor,
+            transparent: true,
+            opacity: 0.9,
           })
           const material1 = new MeshBasicMaterial({
             color: this.options.sideColor,
-            // transparent: true,
-            // opacity: 0.5,
+            transparent: true,
+            // opacity: 0,
           })
 
-          const mesh = new Mesh(geometry, [material, material1])
+          const mesh = new Mesh(new ExtrudeGeometry(
+            shape,
+            {
+              depth: 0.1,
+              bevelEnabled: false,
+              steps: 9,
+              bevelThickness: 1,
+              bevelSize: 1,
+              bevelOffset: 0,
+              bevelSegments: 3
+            }
+          ), [material, material1])
+          province.add(mesh);
+          mesh.position.z = this.options.depth;
+
           const lineGeometry = new BufferGeometry().setFromPoints( points );
           const line = new Line(lineGeometry, lineMaterial)
-          province.add(mesh)
           province.add(line)
         })
       })
 
 
-      const [ x, y ] = projection(elem.properties.center) as any;
+      const [ x, y ] = this.projection(elem.properties.center) as any;
 
       const name = elem.properties.name;
       const text = this.createText(name);
@@ -188,15 +223,94 @@ export default class ThreeJSMap {
       map.add(province);
       this.scene.add(map);
     })
+
+    const city = this.city;
+    const areaBottom = this.createArea(city.geometry.coordinates, {
+      z: 0,
+      depth: 0.005,
+      shapeMaterial: new MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+      }),
+      sideMaterial: new MeshBasicMaterial({
+        color: 'white',
+      }),
+    })
+    this.scene.add(areaBottom);
+
+    const areaMiddle = this.createArea(city.geometry.coordinates, {
+      z: this.options.depth / 2,
+      depth: 0.005,
+      shapeMaterial: new MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+      }),
+      sideMaterial: new MeshBasicMaterial({
+        color: 'white',
+      }),
+    })
+    this.scene.add(areaMiddle);
   }
 
-  private get pyramidTopZ() {
-    return this.options.depth + 0.3
+  /**
+   * 根据坐标创建一块区域
+   *
+   * @private
+   * @param {*} coordinates
+   * @memberof ThreeJSMap
+   */
+  private createArea(coordinates, options: {
+    z: number,
+    depth: number,
+    shapeMaterial: Material,
+    sideMaterial: Material,
+  }) {
+    const area = new Object3D();
+    // 坐标数组
+    coordinates.forEach(polygons => {
+      polygons.forEach(polygon => {
+        const shape = new Shape();
+
+        const lineMaterial = new LineBasicMaterial({
+          color: this.options.borderColor || 'white',
+          linewidth: Number(this.options.borderWidth) || 1
+        })
+
+        const points: Vector3[] = [];
+        for (let i = 0; i < polygon.length; i++) {
+          const [x, y] = this.projection(polygon[i] as any) as any
+          if (i === 0) {
+            shape.moveTo(x, -y)
+          }
+          shape.lineTo(x, -y);
+          points.push(new Vector3(x, -y, this.options.depth));
+        }
+
+        const mesh = new Mesh(new ExtrudeGeometry(
+          shape,
+          {
+            depth: options.depth,
+            bevelEnabled: false,
+            steps: 9,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelOffset: 0,
+            bevelSegments: 3
+          }
+        ), [options.shapeMaterial, options.sideMaterial])
+        area.add(mesh);
+        mesh.position.z = options.z;
+
+        const lineGeometry = new BufferGeometry().setFromPoints( points );
+        const line = new Line(lineGeometry, lineMaterial)
+        area.add(line)
+      })
+    })
+
+    return area;
   }
 
-  private get pyramidBottomZ() {
-    return this.options.depth + 0.15
-  }
+
 
   // 射线追踪
   private initRaycaster() {
@@ -221,7 +335,7 @@ export default class ThreeJSMap {
 
   }
 
-  //
+  // axis tool
   private initAxis() {
     if (!this.options.debug) {
       return
@@ -238,7 +352,7 @@ export default class ThreeJSMap {
    */
   private createPyramid() {
     const pyramid = new Object3D();
-    const pyramidMaterial = new MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
+    const pyramidMaterial = new MeshPhongMaterial( { color: '#1DBAA9' } );
     const pyramid1 = new Mesh( new CylinderGeometry( 0, 0.1, 0.1, 4), pyramidMaterial );
     pyramid1.rotation.x = Math.PI / 2
     const pyramid2 = new Mesh( new CylinderGeometry( 0, 0.1, 0.2, 4), pyramidMaterial );
@@ -329,16 +443,16 @@ export default class ThreeJSMap {
 
       // 恢复上一次清空的
       if (this.lastPick) {
-        this.lastPick.object.material[0].color.set(this.options.mapColor)
-        this.lastPick.object.material[1].color.set(this.options.sideColor)
+        // this.lastPick.object.material[0].color.set(this.options.mapColor)
+        // this.lastPick.object.material[1].color.set(this.options.sideColor)
       }
       this.lastPick = undefined
       this.lastPick = intersects.find(
         (item) => item && item.object && (item.object as Mesh).material && ((item.object as Mesh).material as Material[]).length === 2
       ) as Intersection<Mesh>;
       if (this.lastPick) {
-        this.lastPick.object.material[0].color.set(this.options.hoverColor)
-        this.lastPick.object.material[1].color.set(this.options.hoverColor)
+        // this.lastPick.object.material[0].color.set(this.options.hoverColor)
+        // this.lastPick.object.material[1].color.set(this.options.hoverColor)
       }
     }
 
