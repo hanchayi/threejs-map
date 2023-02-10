@@ -31,6 +31,10 @@ import {
   AmbientLight,
   DirectionalLight,
   MeshStandardMaterial,
+  WireframeGeometry,
+  LineSegments,
+  Float32BufferAttribute,
+  Group,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -64,7 +68,7 @@ export default class ThreeJSMap {
   private clock: Clock;
 
   private get pyramidTopZ() {
-    return this.options.depth + 0.3
+    return this.options.depth + 0.12
   }
 
   private get pyramidBottomZ() {
@@ -179,13 +183,10 @@ export default class ThreeJSMap {
       this.texts.push(text);
       province.add(text)
 
-      const [ pyramid, pyramid1, pyramid2 ] = this.createPyramid()
-      pyramid1.position.set(x, -y, this.pyramidTopZ)
-      pyramid2.position.set(x, -y, this.pyramidBottomZ)
+      const pyramid = this.createPyramid()
+      pyramid.position.set(x, -y, this.pyramidTopZ)
+      this.pyramids.push(pyramid)
       province.add(pyramid)
-      // province.add(pyramid2)
-      this.pyramids.push(pyramid1)
-      this.pyramids.push(pyramid2)
 
       map.add(province);
       this.scene.add(map);
@@ -360,15 +361,31 @@ export default class ThreeJSMap {
    * @memberof ThreeJSMap
    */
   private createPyramid() {
-    const pyramid = new Object3D();
+    const lineMaterial = new LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
+
+    const pyramid = new Group();
     const pyramidMaterial = new MeshBasicMaterial( { color: '#1DBAA9', transparent: true, opacity: 0.8 } );
-    const pyramid1 = new Mesh( new CylinderGeometry( 0, 0.1, 0.1, 4), pyramidMaterial );
+    const pyramid1Geo = new CylinderGeometry( 0, 0.1, 0.1, 4, undefined, true)
+    const pyramid1 = new Mesh( pyramid1Geo, pyramidMaterial );
     pyramid1.rotation.x = Math.PI / 2
-    const pyramid2 = new Mesh( new CylinderGeometry( 0, 0.1, 0.2, 4), pyramidMaterial );
-    pyramid2.rotation.x = -Math.PI / 2
+    pyramid1.position.set(0, 0, 0.15)
+    const lines1 = new LineSegments( new WireframeGeometry(pyramid1Geo), lineMaterial )
+    lines1.position.set(0, 0, 0.15)
+    lines1.rotation.x = Math.PI / 2
+    pyramid.add(lines1);
     pyramid.add(pyramid1)
+
+    const pyramid2Geo = new CylinderGeometry( 0, 0.1, 0.2, 4, undefined, true);
+    const pyramid2 = new Mesh( pyramid2Geo, pyramidMaterial );
+    pyramid2.rotation.x = -Math.PI / 2
+    pyramid2.position.set(0, 0, 0)
+    const lines2 = new LineSegments( new WireframeGeometry(pyramid2Geo), lineMaterial )
+    lines2.position.set(0, 0, 0.0)
+    lines2.rotation.x = -Math.PI / 2
     pyramid.add(pyramid2)
-    return [ pyramid, pyramid1, pyramid2 ];
+    pyramid.add(lines2)
+    
+    return pyramid;
   }
 
   /**
@@ -434,11 +451,7 @@ export default class ThreeJSMap {
     const delta = this.clock.getDelta();
 
     this.pyramids.forEach((pyramid) => {
-      if (pyramid.position.z === this.pyramidTopZ) {
-        pyramid.rotation.y += 1.0 * delta;
-      } else {
-        pyramid.rotation.y -= 1.0 * delta;
-      }
+      pyramid.rotation.z += 1.0 * delta;
     })
 
     // 让字体应用相机旋转角度

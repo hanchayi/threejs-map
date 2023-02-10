@@ -35,6 +35,14 @@ https://font.qqe2.com/ 在线预览字体
 ## 线形问题
 https://blog.csdn.net/wclwksn2019/article/details/125496544
 
+## threejs根据Geometry画LineSigments
+参考这个源码
+https://threejs.org/docs/scenes/geometry-browser.html#CylinderGeometry
+
+## threejs 一个组统一设置坐标
+组合对象统一旋转，自对象的坐标相对于父的
+https://blog.csdn.net/qq_30100043/article/details/79547532
+
 ## reference
 
 [3d可视化地图](https://juejin.cn/post/6980983551399788580)
