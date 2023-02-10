@@ -66,6 +66,8 @@ export default class ThreeJSMap {
   private texts: Mesh[];
   private pyramids: Object3D[] = [];
   private clock: Clock;
+  private lines: LineSegments2[] = []
+  private line?: LineSegments2
 
   private get pyramidTopZ() {
     return this.options.depth + 0.12
@@ -169,6 +171,7 @@ export default class ThreeJSMap {
 
       const province = this.createArea(elem.geometry.coordinates, {
         z: this.options.depth,
+        adcode: elem.properties.adcode,
         depth: 0.005,
         shapeMaterial: material,
         borderColor: 0x85BFEF,
@@ -222,6 +225,7 @@ export default class ThreeJSMap {
     shapeMaterial: Material,
     borderColor: number,
     borderWidth: number,
+    adcode: number,
   }) {
     const area = new Object3D();
     // 坐标数组
@@ -255,6 +259,7 @@ export default class ThreeJSMap {
           color: options.borderColor
         })])
         area.add(mesh);
+        mesh.name = 'area_' + options.adcode;
         mesh.position.z = options.z;
 
         const lineGeometry = new LineGeometry();
@@ -267,6 +272,8 @@ export default class ThreeJSMap {
         lineMaterial.resolution.set(this.options.width, this.options.height);
         let buildoutline = new LineSegments2(lineGeometry, lineMaterial);
         buildoutline.position.z = 0.01
+        buildoutline.name = 'line_' + options.adcode;
+        this.lines.push(buildoutline)
         area.add(buildoutline)
       })
     })
@@ -278,8 +285,9 @@ export default class ThreeJSMap {
     z: number,
     color: number,
     width: number,
+    name?: string
   }) {
-    const area = new Object3D();
+    const line = new Object3D();
     // 坐标数组
     coordinates.forEach(polygons => {
       polygons.forEach(polygon => {
@@ -299,12 +307,15 @@ export default class ThreeJSMap {
         lineMaterial.resolution.set(this.options.width, this.options.height);
         let buildoutline = new LineSegments2(lineGeometry, lineMaterial);
         buildoutline.position.z = options.z
-        area.add(buildoutline)
+        line.add(buildoutline)
       })
     })
 
-    area.position.z = options.z
-    return area;
+    line.position.z = options.z
+    if (options.name) {
+      line.name = options.name;
+    }
+    return line;
   }
 
   // 射线追踪
@@ -322,11 +333,6 @@ export default class ThreeJSMap {
 
   // 地面
   private initGround() {
-    // const groundGeometry = new BoxGeometry( 10, 10, 10);
-    // const groundMaterial = new MeshBasicMaterial( { color: 'white' } );
-    // const groundMesh = new Mesh( groundGeometry, groundMaterial );
-    // groundMesh.position.z = -1;
-    // this.scene.add( groundMesh );
     const texture = new TextureLoader().load( groundUrl );
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
@@ -334,12 +340,10 @@ export default class ThreeJSMap {
 
     const material = new MeshBasicMaterial({
       map: texture,
-      // color: this.options.mapColor,
       transparent: true,
       opacity: 0.5,
     })
     const geometry = new PlaneGeometry( 20, 20 );
-    // const material = new MeshBasicMaterial( {color: 0xffff00, side: DoubleSide} );
     const plane = new Mesh( geometry, material );
     this.scene.add( plane );
   }
@@ -470,17 +474,32 @@ export default class ThreeJSMap {
       )
 
       // 恢复上一次清空的
+      const up = 0.02;
       if (this.lastPick) {
-        // this.lastPick.object.material[0].color.set(this.options.mapColor)
-        // this.lastPick.object.material[1].color.set(this.options.sideColor)
+        this.lastPick.object.position.z -= up;
       }
-      this.lastPick = undefined
+
+      if (this.line) {
+        this.line.position.z -= up;
+      }
+
+      this.lastPick = undefined;
+      this.line = undefined;
+
       this.lastPick = intersects.find(
-        (item) => item && item.object && (item.object as Mesh).material && ((item.object as Mesh).material as Material[]).length === 2
+        (item) => item && item.object && item.object.name.includes('area')
       ) as Intersection<Mesh>;
-      if (this.lastPick) {
-        // this.lastPick.object.material[0].color.set(this.options.hoverColor)
-        // this.lastPick.object.material[1].color.set(this.options.hoverColor)
+      const area = this.lastPick && this.lastPick.object
+      if (area) {
+        const adcode = area.name.split('_')[1]
+        area.position.z += up
+        const line = this.lines.find(line => {
+          return line.name === 'line_' + adcode
+        })
+        if (line) {
+          line.position.z += up
+          this.line = line;
+        }
       }
     }
 

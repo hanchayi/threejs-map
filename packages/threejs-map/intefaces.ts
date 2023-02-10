@@ -12,10 +12,11 @@ export interface ThreeJSMapOptions {
     features: Array<{
       properties: {
         name: string;
+        adcode: number;
         center: [number, number];
       },
       geometry: {
-        coordinates: Array<Array<[number, number]>>
+        coordinates: Coordinate[]
       }
     }>
   };
@@ -25,3 +26,5 @@ export interface ThreeJSMapOptions {
   fillColor?: string;
   backgroundColor?: string;
 }
+
+export type Coordinate = Array<Array<[number, number]>>
