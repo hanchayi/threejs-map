@@ -4,7 +4,6 @@ import {
   PerspectiveCamera,
   WebGLRenderer,
   Raycaster,
-  BufferGeometry,
   Mesh,
   Object3D,
   Shape,
@@ -12,28 +11,21 @@ import {
   MeshBasicMaterial,
   LineBasicMaterial,
   Vector3,
-  Line,
   Vector2,
   Intersection,
   Material,
   DoubleSide,
   ShapeGeometry,
   CylinderGeometry,
-  MeshPhongMaterial,
-  BoxGeometry,
-  MeshLambertMaterial,
   AxesHelper,
   Clock,
   TextureLoader,
   RepeatWrapping,
   PlaneGeometry,
-  sRGBEncoding,
   AmbientLight,
-  DirectionalLight,
   MeshStandardMaterial,
   WireframeGeometry,
   LineSegments,
-  Float32BufferAttribute,
   Group,
 } from "three";
 import * as d3 from 'd3';
@@ -160,7 +152,8 @@ export default class ThreeJSMap {
       const texture = new TextureLoader().load( mapUrl );
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;
-      texture.repeat.set( 0.3, 0.3 );
+      texture.repeat.set( 0.2, 0.3 );
+      texture.center.set( 0.5, 0.5 );
 
       const material = new MeshStandardMaterial({
         map: texture,
