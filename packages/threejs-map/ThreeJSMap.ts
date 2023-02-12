@@ -131,6 +131,12 @@ export default class ThreeJSMap {
       throw new Error('camera and renderer must init first')
     }
     this.control = new OrbitControls(this.camera, canvas);
+    this.control.maxDistance = 5.5
+    this.control.minDistance = 3
+    this.control.minPolarAngle = Math.PI * 0.6
+    this.control.maxPolarAngle = Math.PI * 0.9
+    this.control.maxAzimuthAngle = Math.PI * 2
+    this.control.minAzimuthAngle = Math.PI * 2
   }
 
   // 刷新配置
@@ -329,14 +335,14 @@ export default class ThreeJSMap {
     const texture = new TextureLoader().load( groundUrl );
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
-    texture.repeat.set( 8, 8 );
+    texture.repeat.set( 16, 8 );
 
     const material = new MeshBasicMaterial({
       map: texture,
       transparent: true,
       opacity: 0.5,
     })
-    const geometry = new PlaneGeometry( 20, 20 );
+    const geometry = new PlaneGeometry( 40, 20 );
     const plane = new Mesh( geometry, material );
     this.scene.add( plane );
   }
