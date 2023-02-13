@@ -2,21 +2,26 @@
   "name": "@ag/map",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup src/index.ts --format cjs --dts",
+    "dev": "npm run build -- --watch"
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/d3": "^7.4.0",
     "d3": "^7.8.2",
-    "three": "^0.149.0",
-    "@ag/font": "workspace:*",
-    "@ag/geo": "workspace:*"
+    "three": "^0.149.0"
   },
   "devDependencies": {
-    "@types/three": "^0.149.0"
+    "@ag/font": "workspace:*",
+    "@ag/geo": "workspace:*",
+    "@types/d3": "^7.4.0",
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/three": "^0.149.0",
+    "tsup": "^6.6.2"
   }
 }

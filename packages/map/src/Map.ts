@@ -1,4 +1,4 @@
-import { ThreeJSMapOptions } from './intefaces';
+import { MapOptions } from './intefaces';
 import {
   Scene,
   PerspectiveCamera,
@@ -50,7 +50,7 @@ export default class Map {
   private control: OrbitControls;
   private raycaster: Raycaster;
   private mouse?: Vector2;
-  private options: ThreeJSMapOptions;
+  private options: MapOptions;
   private onMouseMove: (event: MouseEvent) => void;
   private rect: DOMRect;
   private lastPick?: Intersection<Mesh>;
@@ -90,14 +90,14 @@ export default class Map {
     return projection;
   }
 
-  constructor(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
+  constructor(canvas: HTMLCanvasElement, options: MapOptions) {
     this.canvas = canvas;
     this.rect = canvas.getBoundingClientRect();
     this.options = options;
     this.scene = new Scene();
 
     this.initCamera();
-    this.initRenderer(canvas, options);
+    this.initRenderer(canvas);
     this.initControl(canvas);
     this.initRaycaster();
     this.initAxis();
@@ -116,12 +116,12 @@ export default class Map {
   }
 
   // 渲染器
-  private initRenderer(canvas: HTMLCanvasElement, options: ThreeJSMapOptions) {
+  private initRenderer(canvas: HTMLCanvasElement) {
     const renderer = new WebGLRenderer({
       canvas
     });
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(options.width, options.height);
+    renderer.setSize(this.options.width, this.options.height);
     this.renderer = renderer;
   }
 
@@ -143,7 +143,7 @@ export default class Map {
   }
 
   // 刷新配置
-  public changeOptions(options: ThreeJSMapOptions) {
+  public changeOptions(options: MapOptions) {
     this.options = options;
     this.scene.clear();
     this.initMap();
