@@ -50,7 +50,6 @@ onMounted(() => {
         </select>
       width<input type="number" v-model="width" @change="fresh"/>
       height<input type="number" v-model="height" @change="fresh"/>
-      active<input type="number" v-model="height" @change="fresh"/>
       
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
