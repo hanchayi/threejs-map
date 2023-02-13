@@ -11,6 +11,7 @@ export interface MapOptions {
   textColor?: string;
   fillColor?: string;
   adcode: number;
+  actives: number[];
   onClick?: (adcode: GeoJsonProperties) => void;
 }
 

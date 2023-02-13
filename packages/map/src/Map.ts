@@ -189,11 +189,13 @@ export default class Map {
       this.texts.push(text);
       province.add(text)
 
-      const pyramid = this.createPyramid()
-      pyramid.position.set(x, -y, this.pyramidTopZ)
-      this.pyramids.push(pyramid)
-      province.add(pyramid)
-
+      if (this.options.actives.includes(elem.properties.adcode)) {
+        const pyramid = this.createPyramid()
+        pyramid.position.set(x, -y, this.pyramidTopZ)
+        this.pyramids.push(pyramid)
+        province.add(pyramid)
+      }
+     
       map.add(province);
       this.scene.add(map);
     })
