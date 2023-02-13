@@ -30,10 +30,10 @@ import {
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
-import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
-import { Font } from 'three/examples/jsm/loaders/FontLoader';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
+import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import font from 'font/build/geo/HarmonyOS Sans SC_Regular.json';
 import geos from '@hanchayi/geo';
 
@@ -194,7 +194,7 @@ export default class Map {
         this.pyramids.push(pyramid)
         province.add(pyramid)
       }
-     
+
       map.add(province);
       this.scene.add(map);
     })
@@ -401,7 +401,7 @@ export default class Map {
     lines2.rotation.x = -Math.PI / 2
     pyramid.add(pyramid2)
     pyramid.add(lines2)
-    
+
     return pyramid;
   }
 
