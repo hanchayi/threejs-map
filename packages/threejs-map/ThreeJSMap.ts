@@ -131,10 +131,13 @@ export default class ThreeJSMap {
       throw new Error('camera and renderer must init first')
     }
     this.control = new OrbitControls(this.camera, canvas);
+    // 镜头远近
     this.control.maxDistance = 5.5
     this.control.minDistance = 3
+    // 前后角度
     this.control.minPolarAngle = Math.PI * 0.6
     this.control.maxPolarAngle = Math.PI * 0.9
+    // 左右角度 设为固定值则不可调整
     this.control.maxAzimuthAngle = Math.PI * 2
     this.control.minAzimuthAngle = Math.PI * 2
   }
