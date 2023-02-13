@@ -1,6 +1,6 @@
 {
   "name": "@hanchayi/map",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "",
   "private": false,
   "publishConfig": {
@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "npm run build -- --watch"
+    "dev": "npm run build -- --watch",
+    "pub": "npm version patch && npm run build && git add . && git commit -a -m 'publish' && npm publish"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
