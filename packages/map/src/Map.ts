@@ -30,13 +30,12 @@ import {
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
-import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
-import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
-import jiangsu from 'geo/jiangsu.json'
+import { Font } from 'three/examples/jsm/loaders/FontLoader';
+import font from 'font/build/geo/HarmonyOS Sans SC_Regular.json';
+import geos from '@hanchayi/geo';
 
 
 export default class Map {
@@ -68,8 +67,7 @@ export default class Map {
   }
 
   private get city() {
-    const city = jiangsu.features.find(f => f.properties.adcode === 320600)
-
+    const city = geos.find(f => f.properties.adcode === this.options.adcode)
     if (!city) {
       throw new Error('city not found')
     }
@@ -154,7 +152,7 @@ export default class Map {
     this.pyramids = [];
     const map = this.map;
 
-    const geojson = this.options.geojson;
+    const geojson = this.city;
     geojson.features.forEach((elem) => {
       const texture = new TextureLoader().load( this.options.mapUrl );
       texture.wrapS = RepeatWrapping;
@@ -178,7 +176,7 @@ export default class Map {
         borderWidth: 2
       })
 
-      const [ x, y ] = this.projection(elem.properties.center) as any;
+      const [ x, y ] = this.projection(elem.properties.center as any) as any;
 
       const name = elem.properties.name;
       const text = this.createText(name);

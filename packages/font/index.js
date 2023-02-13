@@ -1,10 +1,12 @@
 var Fontmin = require('fontmin');
-var nantong = require('@hanchayi/geo/nantong.json')
+var geos = require('@hanchayi/geo').default
 const _ = require('lodash')
 
 let text = ''
-nantong.features.forEach(f => {
-  text += f.properties.name
+geos.forEach(geo => {
+    geo.features.forEach(f => {
+        text += f.properties.name
+    })
 })
 
 text = _.uniq(text.split('')).join('')
@@ -16,7 +18,7 @@ var fontmin = new Fontmin()
         text,
         hinting: false         // keep ttf hint info (fpgm, prep, cvt). default = true
     }))
-    .dest('build/nantong');
+    .dest('build/geo');
 
 fontmin.run(function (err, files) {
     if (err) {

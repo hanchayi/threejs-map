@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { Map, MapOptions } from '@hanchayi/map'
-import nantong from '@hanchayi/geo/nantong.json';
 import groundUrl from './ground.png';
 import mapUrl from './map.png';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
 const height = ref(600);
-const borderWidth = ref(1);
 const borderColor = ref('#2d8cf0');
-const textColor = ref('#fff');
-const fillColor = ref('#fff');
-const hoverColor = ref('yellow');
-const backgroundColor = ref('#fff');
-// china [104.0, 37.5] nantong [120.864608, 32.016212]
-const center = [120.864608, 32.016212]
 let map: Map
 
 const options = computed<MapOptions>(() => {
@@ -25,19 +17,10 @@ const options = computed<MapOptions>(() => {
     debug: true,
     width: width.value,
     height: height.value,
-    mapColor: 'red',
-    sideColor: 'green',
-    hoverColor: 'yellow',
-    fontUrl: 'HarmonyOS Sans SC_Regular.json',
-    center,
     camera: [0, -3, 3],
     depth: 0.5,
-    geojson: nantong as any,
-    borderWidth: borderWidth.value,
-    borderColor: borderColor.value,
-    textColor: textColor.value,
-    fillColor: fillColor.value,
-    backgroundColor: backgroundColor.value
+    // adcode: 320000 // 江苏
+    adcode: 320600 // 南通
   }
 })
 

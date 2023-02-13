@@ -37,7 +37,10 @@ importers:
       lodash: registry.npmmirror.com/lodash/4.17.21
 
   packages/geo:
-    specifiers: {}
+    specifiers:
+      tsup: ^6.6.2
+    devDependencies:
+      tsup: 6.6.2
 
   packages/map:
     specifiers:
