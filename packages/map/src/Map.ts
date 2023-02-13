@@ -141,8 +141,7 @@ export default class Map {
   // 刷新配置
   public changeOptions(options: MapOptions) {
     this.options = options;
-    this.scene.clear();
-    this.initMap();
+    this.render();
   }
 
   // 初始化地图
@@ -435,10 +434,9 @@ export default class Map {
   }
 
   public render() {
+    this.scene.clear();
     const light = new AmbientLight( 0xffffff, 1.8 ); // soft white light
     this.scene.add( light );
-    // const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
-    // this.scene.add( directionalLight );
     this.initGround();
     this.initMap();
 

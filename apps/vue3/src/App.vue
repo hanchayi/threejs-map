@@ -7,6 +7,7 @@ import mapUrl from './map.png';
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
 const height = ref(600);
+const adcode = ref(320600);
 const borderColor = ref('#2d8cf0');
 let map: Map
 
@@ -19,8 +20,7 @@ const options = computed<MapOptions>(() => {
     height: height.value,
     camera: [0, -3, 3],
     depth: 0.5,
-    // adcode: 320000 // 江苏
-    adcode: 320600 // 南通
+    adcode: adcode.value
   }
 })
 
@@ -40,7 +40,10 @@ onMounted(() => {
 <template>
   <div>
     <div>
-      边框粗细<input v-model="borderWidth" @change="fresh"/>
+      地区<select v-model="adcode" @change="fresh">
+          <option :value="320000">江苏</option>
+          <option :value="320600">南通</option>
+        </select>
       边框颜色<input v-model="borderColor" @change="fresh"/>
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
