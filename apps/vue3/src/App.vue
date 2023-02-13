@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from 'vue'
-import ThreeJSMap from 'threejs-map'
-import { ThreeJSMapOptions } from 'threejs-map/intefaces';
-import nantong from 'geo/nantong.json';
+import { Map, MapOptions } from '@ag/map'
+import nantong from '@ag/geo/nantong.json';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
@@ -15,9 +14,9 @@ const hoverColor = ref('yellow');
 const backgroundColor = ref('#fff');
 // china [104.0, 37.5] nantong [120.864608, 32.016212]
 const center = [120.864608, 32.016212]
-let map: ThreeJSMap
+let map: Map
 
-const options = computed<ThreeJSMapOptions>(() => {
+const options = computed<MapOptions>(() => {
   return {
     debug: true,
     width: width.value,
@@ -45,7 +44,7 @@ function fresh() {
 onMounted(() => {
   nextTick(() => {
     if (canvas.value) {
-      map = new ThreeJSMap(canvas.value, options.value)
+      map = new Map(canvas.value, options.value)
     }
   })
 })

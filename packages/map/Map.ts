@@ -41,7 +41,7 @@ import groundUrl from './ground.png'
 import jiangsu from 'geo/jiangsu.json'
 
 
-export default class ThreeJSMap {
+export default class Map {
   private canvas: HTMLCanvasElement;
   private scene: Scene;
   private camera: PerspectiveCamera;

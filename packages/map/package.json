@@ -1,5 +1,5 @@
 {
-  "name": "threejs-map",
+  "name": "@ag/map",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,8 +13,8 @@
     "@types/d3": "^7.4.0",
     "d3": "^7.8.2",
     "three": "^0.149.0",
-    "font": "workspace:*",
-    "geo": "workspace:*"
+    "@ag/font": "workspace:*",
+    "@ag/geo": "workspace:*"
   },
   "devDependencies": {
     "@types/three": "^0.149.0"

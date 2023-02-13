@@ -1,5 +1,5 @@
 {
-  "name": "font",
+  "name": "@ag/font",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "fontmin": "^0.9.9",
-    "geo": "workspace:*",
+    "@ag/geo": "workspace:*",
     "lodash": "^4.17.21"
   }
 }

@@ -1,4 +1,4 @@
-export interface ThreeJSMapOptions {
+export interface MapOptions {
   debug?: boolean;
   width: number;
   height: number;
