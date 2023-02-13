@@ -1,5 +1,5 @@
 var Fontmin = require('fontmin');
-var nantong = require('@ag/geo/nantong.json')
+var nantong = require('@hanchayi/geo/nantong.json')
 const _ = require('lodash')
 
 let text = ''

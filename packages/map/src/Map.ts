@@ -36,8 +36,6 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
 import { Font, FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import font from 'font/build/nantong/HarmonyOS Sans SC_Regular.json';
-import mapUrl from './map.png'
-import groundUrl from './ground.png'
 import jiangsu from 'geo/jiangsu.json'
 
 
@@ -158,7 +156,7 @@ export default class Map {
 
     const geojson = this.options.geojson;
     geojson.features.forEach((elem) => {
-      const texture = new TextureLoader().load( mapUrl );
+      const texture = new TextureLoader().load( this.options.mapUrl );
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;
       texture.repeat.set( 0.2, 0.3 );
@@ -335,7 +333,7 @@ export default class Map {
 
   // 地面
   private initGround() {
-    const texture = new TextureLoader().load( groundUrl );
+    const texture = new TextureLoader().load( this.options.groundUrl );
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
     texture.repeat.set( 16, 8 );

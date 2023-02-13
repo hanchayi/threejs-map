@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from 'vue'
-import { Map, MapOptions } from '@ag/map'
-import nantong from '@ag/geo/nantong.json';
+import { Map, MapOptions } from '@hanchayi/map'
+import nantong from '@hanchayi/geo/nantong.json';
+import groundUrl from './ground.png';
+import mapUrl from './map.png';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
@@ -18,6 +20,8 @@ let map: Map
 
 const options = computed<MapOptions>(() => {
   return {
+    groundUrl,
+    mapUrl,
     debug: true,
     width: width.value,
     height: height.value,

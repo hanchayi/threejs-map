@@ -7,18 +7,18 @@ importers:
 
   apps/vue3:
     specifiers:
-      '@ag/font': workspace:*
-      '@ag/geo': workspace:*
-      '@ag/map': workspace:*
+      '@hanchayi/font': workspace:*
+      '@hanchayi/geo': workspace:*
+      '@hanchayi/map': workspace:*
       '@vitejs/plugin-vue': ^4.0.0
       typescript: ^4.9.3
       vite: ^4.0.0
       vue: ^3.2.45
       vue-tsc: ^1.0.11
     dependencies:
-      '@ag/font': link:../../packages/font
-      '@ag/geo': link:../../packages/geo
-      '@ag/map': link:../../packages/map
+      '@hanchayi/font': link:../../packages/font
+      '@hanchayi/geo': link:../../packages/geo
+      '@hanchayi/map': link:../../packages/map
       vue: registry.npmmirror.com/vue/3.2.46
     devDependencies:
       '@vitejs/plugin-vue': registry.npmmirror.com/@vitejs/plugin-vue/4.0.0_vite@4.0.4+vue@3.2.46
@@ -28,11 +28,11 @@ importers:
 
   packages/font:
     specifiers:
-      '@ag/geo': workspace:*
+      '@hanchayi/geo': workspace:*
       fontmin: ^0.9.9
       lodash: ^4.17.21
     dependencies:
-      '@ag/geo': link:../geo
+      '@hanchayi/geo': link:../geo
       fontmin: registry.npmmirror.com/fontmin/0.9.9
       lodash: registry.npmmirror.com/lodash/4.17.21
 
@@ -41,8 +41,8 @@ importers:
 
   packages/map:
     specifiers:
-      '@ag/font': workspace:*
-      '@ag/geo': workspace:*
+      '@hanchayi/font': workspace:*
+      '@hanchayi/geo': workspace:*
       '@tsconfig/recommended': ^1.0.2
       '@types/d3': ^7.4.0
       '@types/three': ^0.149.0
@@ -53,8 +53,8 @@ importers:
       d3: 7.8.2
       three: 0.149.0
     devDependencies:
-      '@ag/font': link:../font
-      '@ag/geo': link:../geo
+      '@hanchayi/font': link:../font
+      '@hanchayi/geo': link:../geo
       '@tsconfig/recommended': 1.0.2
       '@types/d3': 7.4.0
       '@types/three': 0.149.0

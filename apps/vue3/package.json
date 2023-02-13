@@ -1,5 +1,5 @@
 {
-  "name": "@ag/map-vue3",
+  "name": "@hanchayi/map-vue3",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "vue": "^3.2.45",
-    "@ag/map": "workspace:*",
-    "@ag/geo": "workspace:*",
-    "@ag/font": "workspace:*"
+    "@hanchayi/map": "workspace:*",
+    "@hanchayi/geo": "workspace:*",
+    "@hanchayi/font": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

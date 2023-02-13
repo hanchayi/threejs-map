@@ -1,4 +1,6 @@
 export interface MapOptions {
+  mapUrl: string;
+  groundUrl: string;
   debug?: boolean;
   width: number;
   height: number;

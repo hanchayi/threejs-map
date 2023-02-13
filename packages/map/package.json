@@ -1,6 +1,6 @@
 {
-  "name": "@ag/map",
-  "version": "0.0.1",
+  "name": "@hanchayi/map",
+  "version": "0.0.3",
   "description": "",
   "private": false,
   "publishConfig": {
@@ -8,10 +8,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup src/index.ts --format cjs --dts",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "npm run build -- --watch"
   },
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "keywords": [],
   "author": "",
@@ -21,8 +22,8 @@
     "three": "^0.149.0"
   },
   "devDependencies": {
-    "@ag/font": "workspace:*",
-    "@ag/geo": "workspace:*",
+    "@hanchayi/font": "workspace:*",
+    "@hanchayi/geo": "workspace:*",
     "@types/d3": "^7.4.0",
     "@tsconfig/recommended": "^1.0.2",
     "@types/three": "^0.149.0",
