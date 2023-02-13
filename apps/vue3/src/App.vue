@@ -8,7 +8,6 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
 const height = ref(600);
 const adcode = ref(320600);
-const borderColor = ref('#2d8cf0');
 let map: Map
 
 const options = computed<MapOptions>(() => {
@@ -24,7 +23,7 @@ const options = computed<MapOptions>(() => {
   }
 })
 
-function fresh() {
+function fresh() { 
   map.changeOptions(options.value)
 }
 
@@ -44,7 +43,8 @@ onMounted(() => {
           <option :value="320000">江苏</option>
           <option :value="320600">南通</option>
         </select>
-      边框颜色<input v-model="borderColor" @change="fresh"/>
+      width<input type="number" v-model="width" @change="fresh"/>
+      height<input type="number" v-model="height" @change="fresh"/>
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
   </div>

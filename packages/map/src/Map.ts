@@ -88,18 +88,22 @@ export default class Map {
 
   constructor(canvas: HTMLCanvasElement, options: MapOptions) {
     this.canvas = canvas;
-    this.rect = canvas.getBoundingClientRect();
     this.options = options;
-    this.scene = new Scene();
+    this.init()
+    this.render();
+  }
 
+  // 初始化
+  private init() {
+    this.rect = this.canvas.getBoundingClientRect();
+    this.scene = new Scene();
+    this.font = new Font(font);
+    this.clock = new Clock();
     this.initCamera();
-    this.initRenderer(canvas);
-    this.initControl(canvas);
+    this.initRenderer();
+    this.initControl();
     this.initRaycaster();
     this.initAxis();
-    this.font = new Font(font);
-    this.clock = new Clock()
-    this.render();
   }
 
   // 相机
@@ -112,7 +116,8 @@ export default class Map {
   }
 
   // 渲染器
-  private initRenderer(canvas: HTMLCanvasElement) {
+  private initRenderer() {
+    const canvas = this.canvas;
     const renderer = new WebGLRenderer({
       canvas
     });
@@ -122,7 +127,8 @@ export default class Map {
   }
 
   // 控制器，用于调整相机位置
-  private initControl(canvas: HTMLCanvasElement) {
+  private initControl() {
+    const canvas = this.canvas;
     if (!this.camera || !this.renderer) {
       throw new Error('camera and renderer must init first')
     }
@@ -141,6 +147,8 @@ export default class Map {
   // 刷新配置
   public changeOptions(options: MapOptions) {
     this.options = options;
+
+    this.init();
     this.render();
   }
 
