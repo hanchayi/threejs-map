@@ -19,7 +19,10 @@ const options = computed<MapOptions>(() => {
     height: height.value,
     camera: [0, -3, 3],
     depth: 0.5,
-    adcode: adcode.value
+    adcode: adcode.value,
+    onClick: (area) => {
+      alert(`${JSON.stringify(area)} clicked`)
+    }
   }
 })
 

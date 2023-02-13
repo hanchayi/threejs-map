@@ -1,4 +1,4 @@
-import { MapOptions } from './intefaces';
+import { GeoJson, MapOptions } from './intefaces';
 import {
   Scene,
   PerspectiveCamera,
@@ -49,6 +49,7 @@ export default class Map {
   private mouse?: Vector2;
   private options: MapOptions;
   private onMouseMove: (event: MouseEvent) => void;
+  private onClick: (event: MouseEvent) => void;
   private rect: DOMRect;
   private lastPick?: Intersection<Mesh>;
   private font?: Font;
@@ -56,18 +57,15 @@ export default class Map {
   private pyramids: Object3D[] = [];
   private clock: Clock;
   private lines: LineSegments2[] = []
-  private line?: LineSegments2
+  private line?: LineSegments2;
+  private adcode: number = 0;
 
   private get pyramidTopZ() {
     return this.options.depth + 0.12
   }
 
-  private get pyramidBottomZ() {
-    return this.options.depth + 0.15
-  }
-
-  private get city() {
-    const city = geos.find(f => f.properties.adcode === this.options.adcode)
+  private get city(): GeoJson {
+    const city = geos.find(f => f.properties.adcode === this.options.adcode);
     if (!city) {
       throw new Error('city not found')
     }
@@ -332,8 +330,17 @@ export default class Map {
       this.mouse.x = ((event.clientX - this.rect.left )/ this.options.width) * 2 - 1
       this.mouse.y = -((event.clientY - this.rect.top) / this.options.height) * 2 + 1
     }
+    this.onClick = () => {
+      if (this.adcode && this.options.onClick) {
+        const find = this.city.features.find(f => f.properties.adcode === this.adcode)
+        if (find) {
+         this.options.onClick(find.properties)
+        }
+      }
+    }
 
     this.canvas.addEventListener('mousemove', this.onMouseMove, false)
+    this.canvas.addEventListener('click', this.onClick, false)
   }
 
   // 地面
@@ -496,6 +503,7 @@ export default class Map {
       const area = this.lastPick && this.lastPick.object
       if (area) {
         const adcode = area.name.split('_')[1]
+        this.adcode = Number(adcode)
         area.position.z += up
         const line = this.lines.find(line => {
           return line.name === 'line_' + adcode
@@ -504,6 +512,8 @@ export default class Map {
           line.position.z += up
           this.line = line;
         }
+      } else {
+        this.adcode = 0
       }
     }
 

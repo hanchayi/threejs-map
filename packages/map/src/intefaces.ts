@@ -11,25 +11,27 @@ export interface MapOptions {
   textColor?: string;
   fillColor?: string;
   adcode: number;
+  onClick?: (adcode: GeoJsonProperties) => void;
 }
 
 export interface GeoJson {  // 地图数据
   properties: GeoJsonProperties;
   features: Array<{
-    properties: {
-      
-    },
+    properties: GeoJsonProperties,
     geometry: {
       coordinates: Coordinate[]
     }
-  }>
+  }>;
+  geometry: {
+    coordinates: Coordinate[]
+  }
 };
 
 export interface GeoJsonProperties {
   name: string;
   adcode: number;
-  center: [number, number];
+  center: number[];
   level: string;
 }
 
-export type Coordinate = Array<Array<[number, number]>>
+export type Coordinate = Array<Array<number[]>>
