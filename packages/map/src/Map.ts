@@ -108,8 +108,7 @@ export default class Map {
   private initCamera() {
     const { options } = this;
     this.camera = new PerspectiveCamera(75, options.width / options.height, 0.1, 1000);
-    const [ x, y, z ] = this.options.camera
-    this.camera.position.set(x, y, z);
+    this.camera.position.set(this.options.cameraX, this.options.cameraY, this.options.cameraZ);
     this.camera.lookAt(this.scene.position);
   }
 

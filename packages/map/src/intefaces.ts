@@ -5,7 +5,9 @@ export interface MapOptions {
   debug?: boolean;
   width: number;
   height: number;
-  camera: number[]; // 相机位置
+  cameraX: number; // camera postion x
+  cameraY: number; // camera postion y
+  cameraZ: number; // camera postion z
   depth: number; // 地图厚度
   sideColor: string; // 侧边颜色
   textColor?: string;

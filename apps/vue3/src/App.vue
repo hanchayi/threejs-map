@@ -10,6 +10,9 @@ const height = ref(600);
 const adcode = ref(320600);
 const actives = ref([ 320602 ])
 const lightIntensity = ref(1.8)
+const cameraX = ref(0)
+const cameraY = ref(-3)
+const cameraZ = ref(3)
 let map: Map
 
 const options = computed<MapOptions>(() => {
@@ -19,7 +22,9 @@ const options = computed<MapOptions>(() => {
     debug: true,
     width: width.value,
     height: height.value,
-    camera: [0, -3, 3],
+    cameraX: cameraX.value,
+    cameraY: cameraY.value,
+    cameraZ: cameraZ.value,
     depth: 0.5,
     adcode: adcode.value,
     actives: actives.value,
@@ -53,6 +58,9 @@ onMounted(() => {
       width<input type="number" v-model="width" @change="fresh"/>
       height<input type="number" v-model="height" @change="fresh"/>
       light intensity<input type="number" v-model="lightIntensity" @change="fresh"/>
+      cameraX<input type="number" v-model="cameraX" @change="fresh"/>
+      cameraY<input type="number" v-model="cameraY" @change="fresh"/>
+      cameraZ<input type="number" v-model="cameraZ" @change="fresh"/>
       
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
