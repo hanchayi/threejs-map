@@ -12,6 +12,7 @@ export interface MapOptions {
   fillColor?: string;
   adcode: number;
   actives: number[];
+  lightIntensity?: number; // light intensity default 1.8
   onClick?: (adcode: GeoJsonProperties) => void;
 }
 

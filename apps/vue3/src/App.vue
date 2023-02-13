@@ -9,6 +9,7 @@ const width = ref(800);
 const height = ref(600);
 const adcode = ref(320600);
 const actives = ref([ 320602 ])
+const lightIntensity = ref(1.8)
 let map: Map
 
 const options = computed<MapOptions>(() => {
@@ -22,6 +23,7 @@ const options = computed<MapOptions>(() => {
     depth: 0.5,
     adcode: adcode.value,
     actives: actives.value,
+    lightIntensity: lightIntensity.value,
     onClick: (area) => {
       alert(`${JSON.stringify(area)} clicked`)
     }
@@ -50,6 +52,7 @@ onMounted(() => {
         </select>
       width<input type="number" v-model="width" @change="fresh"/>
       height<input type="number" v-model="height" @change="fresh"/>
+      light intensity<input type="number" v-model="lightIntensity" @change="fresh"/>
       
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>

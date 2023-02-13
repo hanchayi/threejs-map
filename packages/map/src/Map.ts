@@ -452,7 +452,7 @@ export default class Map {
 
   public render() {
     this.scene.clear();
-    const light = new AmbientLight( 0xffffff, 1.8 ); // soft white light
+    const light = new AmbientLight( 0xffffff, this.options.lightIntensity || 1.8 ); // soft white light
     this.scene.add( light );
     this.initGround();
     this.initMap();
