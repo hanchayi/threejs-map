@@ -43,6 +43,9 @@ https://threejs.org/docs/scenes/geometry-browser.html#CylinderGeometry
 组合对象统一旋转，自对象的坐标相对于父的
 https://blog.csdn.net/qq_30100043/article/details/79547532
 
+## threejs物体发光
+https://blog.csdn.net/yangjianxun8888/article/details/123569310
+
 ## reference
 
 [3d可视化地图](https://juejin.cn/post/6980983551399788580)
