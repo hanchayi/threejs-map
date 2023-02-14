@@ -1,6 +1,8 @@
 export interface MapOptions {
   mapUrl: string;
   groundUrl: string;
+  locationUrl: string;
+  locations: Location[];
   debug?: boolean;
   width: number;
   height: number;
@@ -12,6 +14,11 @@ export interface MapOptions {
   actives: number[];
   lightIntensity?: number; // light intensity default 1.8
   onClick?: (adcode: GeoJsonProperties) => void;
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
 }
 
 export interface GeoJson {  // 地图数据

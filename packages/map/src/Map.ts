@@ -1,4 +1,4 @@
-import { GeoJson, MapOptions } from './intefaces';
+import { GeoJson, MapOptions, Location } from './intefaces';
 import {
   Scene,
   PerspectiveCamera,
@@ -27,6 +27,12 @@ import {
   WireframeGeometry,
   LineSegments,
   Group,
+  SphereGeometry,
+  MeshLambertMaterial,
+  SpriteMaterial,
+  AdditiveBlending,
+  Sprite,
+  Texture,
 } from "three";
 import * as d3 from 'd3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -36,7 +42,6 @@ import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import font from 'font/build/geo/HarmonyOS Sans SC_Regular.json';
 import geos from '@hanchayi/geo';
-
 
 export default class Map {
   private canvas: HTMLCanvasElement;
@@ -214,6 +219,7 @@ export default class Map {
       color: 0x70D7FC,
     })
     this.scene.add(areaMiddle);
+    this.initLocations()
   }
 
   /**
@@ -369,6 +375,50 @@ export default class Map {
     }
     const axesHelper = new AxesHelper( 5 );
     this.scene.add( axesHelper );
+  }
+
+  private initLocations() {
+    // 加载贴图
+    var textureLoader = new TextureLoader();
+    textureLoader.load(this.options.locationUrl, (texture: Texture) => {
+      this.options.locations.forEach(location => {
+        this.createLocation(location, texture)
+      })
+    });
+  }
+
+  createLocation(location: Location, texture: Texture) {
+    const point = this.projection([location.latitude, location.longitude]);
+
+    if (!point) {
+      throw new Error('invalid location')
+    }
+
+    const color = 0x00FFF0;
+    const [ x, y ] = point;
+    const radius = 0.02;
+    const geometry = new SphereGeometry(radius, 32, 16 );
+    const material = new MeshBasicMaterial({ color });
+    const sphere = new Mesh( geometry, material );
+    sphere.position.set(x, -y, this.options.depth + radius * 4);
+    // 点精灵材质
+    var spriteMaterial = new SpriteMaterial({
+      map: texture.clone(),//贴图
+      transparent: true,
+      // 解决纹理黑边问题
+      depthTest: false,
+      // alphaTest: 0.9,
+      color,
+      //在使用此材质显示对象时要使用何种混合。加法
+      blending: AdditiveBlending,
+    });
+    var sprite = new Sprite(spriteMaterial);
+    // 发光范围
+    const scale = 4.5
+    sprite.scale.set(radius * scale, radius * scale, 1.0);
+    sphere.add(sprite);
+
+    this.scene.add( sphere );
   }
 
   /**

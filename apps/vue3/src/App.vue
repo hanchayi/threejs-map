@@ -3,12 +3,14 @@ import { ref, onMounted, nextTick, computed } from 'vue'
 import { Map, MapOptions } from '@hanchayi/map'
 import groundUrl from './ground.png';
 import mapUrl from './map.png';
+import locationUrl from './location.png';
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const width = ref(800);
 const height = ref(600);
 const adcode = ref(320600);
-const actives = ref([ 320602 ])
+// const actives = ref([ 320602 ])
+const actives = ref([ ])
 const lightIntensity = ref(1.8)
 const cameraX = ref(0)
 const cameraY = ref(-3)
@@ -18,7 +20,30 @@ let map: Map
 const options = computed<MapOptions>(() => {
   return {
     groundUrl,
+    locations: [
+      {
+        latitude: 120.96635,
+        longitude: 32.015278,
+      },
+      {
+        latitude: 121.273171,
+        longitude: 32.184287,
+      },
+      {
+        latitude: 121.286088,
+        longitude: 32.311832,
+      },
+      {
+        latitude: 121.759724,
+        longitude: 31.810158,
+      },
+      {
+        latitude: 120.666324,
+        longitude: 32.391591,
+      },
+    ],
     mapUrl,
+    locationUrl,
     debug: true,
     width: width.value,
     height: height.value,
@@ -35,7 +60,7 @@ const options = computed<MapOptions>(() => {
   }
 })
 
-function fresh() { 
+function fresh() {
   map.changeOptions(options.value)
 }
 
@@ -61,7 +86,7 @@ onMounted(() => {
       cameraX<input type="number" v-model="cameraX" @change="fresh"/>
       cameraY<input type="number" v-model="cameraY" @change="fresh"/>
       cameraZ<input type="number" v-model="cameraZ" @change="fresh"/>
-      
+
     </div>
     <canvas ref="canvas" :width="width * 2" :height="height * 2" :style="`width: ${width}px; height: ${height}px;`"/>
   </div>
